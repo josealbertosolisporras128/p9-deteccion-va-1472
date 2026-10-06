@@ -4,56 +4,52 @@
 import os
 import cv2
 
-# Obtiene la ruta absoluta de la carpeta 'codigo'
-DIR_CODIGO = os.path.dirname(os.path.abspath(__file__))
+# Obtener ruta de la carpeta 'codigo'
+DIR_SCRIPT = os.path.dirname(os.path.abspath(__file__))
 
-# Sube un nivel a la raíz del proyecto y entra a 'imagenes'
-RUTA_IMAGEN = os.path.abspath(os.path.join(DIR_CODIGO, "..", "imagenes", "loro.jpg"))
-RUTA_SALIDA = os.path.abspath(os.path.join(DIR_CODIGO, "..", "resultados", "ejemplo2_contornos_1472.jpg"))
-
-print(f"Buscando imagen en: {RUTA_IMAGEN}")
+# Rutas de entrada y salidas
+RUTA_IMAGEN = os.path.join(DIR_SCRIPT, "..", "imagenes", "loro.jpg")
+DIR_RESULTADOS = os.path.join(DIR_SCRIPT, "..", "resultados")
 
 # Cargar imagen
 imagen = cv2.imread(RUTA_IMAGEN)
 
 if imagen is None:
-    print("\n--------------------------------------------------")
-    print("ERROR: OpenCV no pudo abrir la imagen.")
-    print("--------------------------------------------------")
-    print("Por favor revisa:")
-    print("1. Que el archivo esté dentro de la carpeta 'imagenes'.")
-    print("2. Que no se llame 'loro.png', 'loro.jpeg' o 'Loro.jpg' (las mayúsculas cuentan).")
+    print(f"Error: no se pudo cargar la imagen desde: {os.path.abspath(RUTA_IMAGEN)}")
     exit()
 
-# Convertir a escala de grises y aplicar suavizado
+# Procesamiento
 gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
 desenfocada = cv2.GaussianBlur(gris, (5, 5), 0)
-
-# Umbralización
 _, binaria = cv2.threshold(desenfocada, 127, 255, cv2.THRESH_BINARY)
 
-# Detectar contornos
-contornos, jerarquia = cv2.findContours(
-    binaria,
-    cv2.RETR_EXTERNAL,
-    cv2.CHAIN_APPROX_SIMPLE
-)
+contornos, _ = cv2.findContours(binaria, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-# Dibujar contornos
 resultado = imagen.copy()
 cv2.drawContours(resultado, contornos, -1, (0, 255, 0), 2)
 
-# Mostrar resultados
-cv2.imshow("Imagen original", imagen)
-cv2.imshow("Imagen binaria", binaria)
-cv2.imshow("Contornos detectados", resultado)
+# Mostrar en pantalla
+cv2.imshow("Imagen original 1472", imagen)
+cv2.imshow("Imagen binaria 1472", binaria)
+cv2.imshow("Contornos detectados 1472", resultado)
 
-# Crear carpeta resultados si no existe y guardar
-os.makedirs(os.path.dirname(RUTA_SALIDA), exist_ok=True)
-cv2.imwrite(RUTA_SALIDA, resultado)
+# --- GUARDAR TODOS LOS RESULTADOS ---
+os.makedirs(DIR_RESULTADOS, exist_ok=True)
 
-print("\nCantidad de contornos encontrados:", len(contornos))
-print(f"Resultado guardado en: {RUTA_SALIDA}")
+# 1. Guardar la original
+cv2.imwrite(os.path.join(DIR_RESULTADOS, "ejemplo2_original_1472.jpg"), imagen)
+# 2. Guardar la binaria
+cv2.imwrite(os.path.join(DIR_RESULTADOS, "ejemplo2_binaria_1472.jpg"), binaria)
+# 3. Guardar el resultado final de contornos
+cv2.imwrite(os.path.join(DIR_RESULTADOS, "ejemplo2_contornos_1472.jpg"), resultado)
+
+print("--- Ejemplo 2 completado ---")
+print("Archivos guardados en carpeta resultados:")
+print(" - ejemplo2_original_1472.jpg")
+print(" - ejemplo2_binaria_1472.jpg")
+print(" - ejemplo2_contornos_1472.jpg")
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+print("jose solis nc 1472")
